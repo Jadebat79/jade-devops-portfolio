@@ -1,0 +1,20 @@
+
+airbyte_helm_version = "1.7.1"
+airbyte_namespace    = "airbyte"
+postgresql_host      = ""
+postgresql_port      = 5432
+postgresql_username  = ""
+postgresql_password  = ""
+postgresql_database  = "airbyte_db"
+s3_bucket_name       = ""
+s3_region            = "us-east-1"
+s3_access_key        = ""
+s3_secret_key        = ""
+storage_class_name   = ""
+pvc_size             = "20Gi"
+enable_ingress       = true
+ingress_host         = ""
+ingress_class        = "nginx"
+environment          = "prod"
+airbyte_username     = "admin"
+airbyte_password     = ""

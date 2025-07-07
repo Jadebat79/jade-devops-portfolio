@@ -1,0 +1,55 @@
+# values/openproject-base.yaml
+develop: false
+fullnameOverride: "openproject"
+
+# Disable bundled components
+postgresql:
+  bundled: false
+memcached:
+  bundled: true
+
+# Configure persistence
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  size: 20Gi  # Will be overridden by Terraform
+
+# S3 configuration (non-sensitive parts)
+s3:
+  enabled: true
+  directUploads: true
+  signatureVersion: 4
+  enableSignatureV4Streaming: true
+
+# Disable ingress (created separately)
+ingress:
+  enabled: false
+
+# Resource settings
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi"
+    cpu: "2"
+
+# Security context
+podSecurityContext:
+  enabled: true
+  fsGroup: 1000
+
+containerSecurityContext:
+  enabled: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+# Other optimizations
+cleanup:
+  deletePodsOnSuccess: true
+strategy:
+  type: Recreate

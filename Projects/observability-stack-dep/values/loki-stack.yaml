@@ -1,0 +1,72 @@
+loki:
+  enabled: true
+
+  resources:
+    limits:
+      cpu: "2"
+      memory: "4Gi"
+    requests:
+      cpu: "1"
+      memory: "2Gi"  # Recommended: match typical Loki baseline usage
+
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClassName: ${storage_class}  # Replace with "standard" or actual SC
+    accessModes: [ReadWriteOnce]
+    mountPath: /data/loki  # Critical for data persistence across restarts
+
+  config:
+    chunk_store_config:
+      max_look_back_period: 100h
+      chunk_cache_config:
+        enable_fifocache: true
+        fifocache:
+          max_size_bytes: 1073741824  # 1GB cache
+          validity: 24h  # Keeps recent chunks hot for faster querying
+
+    limits_config:
+      retention_period: 100h
+      max_query_length: 100h
+      reject_old_samples: true
+      reject_old_samples_max_age: 100h  # Prevents stale data ingestion
+      max_query_parallelism: 16
+      ingestion_rate_mb: 16
+      ingestion_burst_size_mb: 32
+
+    table_manager:
+      retention_deletes_enabled: true
+      retention_period: 100h
+
+    compactor:
+      working_directory: /data/loki/compactor
+      shared_store: filesystem
+      compaction_interval: 10m
+      retention_enabled: true
+      retention_delete_delay: 2h
+      retention_delete_worker_count: 150  # High value = aggressive compaction
+
+    schema_config:
+      configs:
+        - from: 2020-05-15
+          store: boltdb-shipper
+          object_store: filesystem
+          schema: v11
+          index:
+            prefix: index_
+            period: 24h
+
+    storage_config:
+      boltdb_shipper:
+        active_index_directory: /data/loki/index
+        cache_location: /data/loki/boltdb-cache
+        cache_ttl: 24h
+        shared_store: filesystem
+      filesystem:
+        directory: /data/loki/chunks
+
+promtail:
+  enabled: true  # Important: ships logs from nodes into Loki
+
+grafana:
+  enabled: false  # Set to true if you want Grafana managed by this chart

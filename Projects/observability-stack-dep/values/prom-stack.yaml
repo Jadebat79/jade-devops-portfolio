@@ -1,0 +1,30 @@
+grafana:
+  ingress:
+    enabled: false  # Ingress is managed externally (e.g., via separate Ingress controller)
+  persistence:
+    enabled: true
+    storageClassName: ${storage_class}  # Replace with actual SC if needed (e.g., "standard")
+    size: 20Gi
+  adminPassword: ${grafana_password}  # Injected via Terraform or secrets manager
+
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: ${storage_class}
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 50Gi  # Enough for ~7-14 days depending on scrape interval
+
+alertmanager:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: ${storage_class}
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi  # Alertmanager's config + silences stored persistently
